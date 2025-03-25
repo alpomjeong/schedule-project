@@ -1,8 +1,9 @@
 package com.example.schedule.repository;
 
-import com.example.schedule.dto.ScheduleRequestDto;
 import com.example.schedule.dto.ScheduleResponseDto;
+import com.example.schedule.entity.Schedule;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -27,21 +28,21 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
      }
 
     @Override
-    public ScheduleResponseDto saveSchedule(ScheduleRequestDto scheduleRequestDto) {
+    public ScheduleResponseDto saveSchedule(Schedule schedule) {
 
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("schedule").usingGeneratedKeyColumns("id");
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("todo",scheduleRequestDto.getTodo());
-        parameters.put("author",scheduleRequestDto.getAuthor());
-        parameters.put("password",scheduleRequestDto.getPassword());
+        parameters.put("todo",schedule.getTodo());
+        parameters.put("author",schedule.getAuthor());
+        parameters.put("password",schedule.getPassword());
         parameters.put("created_at",DatetimeConverter());
         parameters.put("updated_at",DatetimeConverter());
 
 
 
         Number key = jdbcInsert.executeAndReturnKey((new MapSqlParameterSource(parameters)));
-        return new ScheduleResponseDto(key.longValue(), scheduleRequestDto.getTodo(),scheduleRequestDto.getAuthor(),scheduleRequestDto.getPassword(),DatetimeConverter(),DatetimeConverter());
+        return new ScheduleResponseDto(key.longValue(), schedule.getTodo(),schedule.getAuthor(),schedule.getPassword(),DatetimeConverter(),DatetimeConverter());
     }
 
     @Override
@@ -62,17 +63,36 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository {
         return jdbcTemplate.query(sql, params.toArray(), scheduleRowMapper());
     }
 
-    @Override
-    public Optional<ScheduleResponseDto> findScheduleById(Long id) {
-        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapper2(), id);
-        return result.stream().findAny();
-    }
+//    @Override
+//    public Optional<ScheduleResponseDto> findScheduleById(Long id) {
+//        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapper2(), id);
+//        return result.stream().findAny();
+//    }
 
     @Override
     public ScheduleResponseDto findScheduleByIdOrElseThrow(Long id) {
         List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where id = ?", scheduleRowMapper2(), id);
         return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
+
+    @Override
+    public List<String> getPasswordById(Long id) {
+        return jdbcTemplate.query("select password from schedule where id = ?",(rs,i) -> rs.getString("password"),id);
+    }
+
+    @Override
+    public void deleteSchedule(Long id) {
+         String password = getPasswordById(id).toString();
+         jdbcTemplate.update("delete from schedule where id = ?",id);
+    }
+
+    @Override
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(Long id, String author,String todo) {
+        String password =getPasswordById(id).toString();
+         jdbcTemplate.update("UPDATE schedule SET author = ?, todo = ? WHERE id = ?;",author,todo,id);
+         return new ResponseEntity<>(findScheduleByIdOrElseThrow(id),HttpStatus.OK);
+    }
+
 
     public String DatetimeConverter(){
          return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

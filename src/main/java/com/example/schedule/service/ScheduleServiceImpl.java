@@ -4,6 +4,8 @@ import com.example.schedule.dto.ScheduleRequestDto;
 import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.repository.ScheduleRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +18,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto requestDto) {
 
-
-        return scheduleRepository.saveSchedule(requestDto);
+        Schedule schedule = new Schedule(0,requestDto.getTodo(), requestDto.getAuthor(),requestDto.getPassword(),"","");
+        return scheduleRepository.saveSchedule(schedule);
     }
 
     @Override
@@ -28,17 +30,37 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 
     @Override
-    public ScheduleResponseDto findScheduleById(Long id) {
-        // Schedule 엔티티를 DB에서 조회
-        ScheduleResponseDto schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
-
+    public ScheduleResponseDto findScheduleById(Long id){
         // ScheduleResponseDto로 변환 후 반환
-        return new ScheduleResponseDto(
-                schedule.getId(),
-                schedule.getTodo(),
-                schedule.getAuthor(),
-                schedule.getCreated_at().toString(),  // Timestamp를 String으로 변환
-                schedule.getUpdated_at().toString()   // Timestamp를 String으로 변환
-        );
+        return scheduleRepository.findScheduleByIdOrElseThrow(id);
     }
+
+    @Override
+    public ResponseEntity<String> deleteSchedule(Long id, ScheduleRequestDto scheduleRequestDto) {
+
+
+        if(getPasswordById(id).get(0).equals(scheduleRequestDto.getPassword())) {
+           scheduleRepository.deleteSchedule(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Schedule deleted successfully");
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("비번틀림");
+
+
+        }
+
+
+    }
+
+    @Override
+    public List<String> getPasswordById(Long id) {
+       return scheduleRepository.getPasswordById(id);
+
+    }
+
+    @Override
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(Long id, ScheduleRequestDto scheduleRequestDto) {
+        return scheduleRepository.updateSchedule(id,scheduleRequestDto.getTodo(),scheduleRequestDto.getAuthor() );
+    }
+
+
 }

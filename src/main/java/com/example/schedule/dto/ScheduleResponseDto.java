@@ -13,7 +13,6 @@ public class ScheduleResponseDto {
     private String todo;
     private String author;
     private String password;
-
     private String created_at;
     private String updated_at;
 
@@ -25,6 +24,8 @@ public class ScheduleResponseDto {
         this.updated_at = updated_at;
         this.created_at = created_at;
     }
+
+
 }
 
 

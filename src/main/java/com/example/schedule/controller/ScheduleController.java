@@ -3,6 +3,7 @@ package com.example.schedule.controller;
 
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.service.ScheduleService;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,4 +15,6 @@ public class ScheduleController {
 
     public  ScheduleController(ScheduleService scheduleService){this.scheduleService = scheduleService;}
 
+
+    @PostMapping
 }

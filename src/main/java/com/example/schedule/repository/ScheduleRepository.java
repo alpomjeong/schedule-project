@@ -1,4 +1,4 @@
 package com.example.schedule.repository;
 
-public interface MemoRepository {
+public interface ScheduleRepository {
 }

@@ -2,6 +2,10 @@ package com.example.schedule.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -10,14 +14,7 @@ public class Schedule {
     private String todo;
     private String author;
     private String password;
-    private String created_at;
-    private String updated_at;
+    private Timestamp created_at;
+    private Timestamp updated_at;
 
-    public Schedule(String todo, String author, String password, String created_at, String updated_at) {
-        this.todo = todo;
-        this.author = author;
-        this.password = password;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-    }
 }

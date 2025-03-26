@@ -44,4 +44,4 @@ SQL을 사용해 일정(Schedule) 데이터를 저장, 조회, 수정, 삭제하
 | 일정 삭제      | DELETE | /schedules/{id} | RequestBody, {   "password": "securepassword" }                                              | {   "message": "일정이 삭제되었습니다." }                                                                                                                                                                                                                                                                                         | 200/ 삭제 ok   |
 
 
-
+![Image](https://github.com/user-attachments/assets/3c70e27b-2a0c-4442-9d0d-ac08db326303)
